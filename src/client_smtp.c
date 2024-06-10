@@ -8,6 +8,8 @@
 #include <sysexits.h>
 
 #define DEFAULT_PORT "25"
+#define MAX_ATTEMPTS 5
+#define WAIT_TIME 5
 
 static FILE *tcp_connect(const char *hostname, const char *port);
 
@@ -84,14 +86,102 @@ int main(int argc, char **argv) {
     if(strlen(port) > 4) {
         fprintf(stderr, "[!] Invalid port number: %s\n", port);
         exit(EX_DATAERR);
-    } else if(strlen(port) == 0) {
-        strncpy(port, DEFAULT_PORT, 4);
+    } 
+
+    FILE* mail_body = fopen(message_file, "r");
+    if(mail_body == NULL) {
+        fprintf(stderr, "[!] Could not open message file: %s\n", message_file);
+        exit(EX_NOINPUT);
+    }
+
+    FILE* tcp_socket;
+    char buffer[200];
+    smtp_state_t state = CONNECTION;
+
+    int attempt = 0;
+    while(1) {
+        printf("[*] State: %d\n", state);
+
+        switch(state) {
+            case CONNECTION:
+                tcp_socket = tcp_connect(mail_server, port);
+                if(tcp_socket == NULL) {
+                    fprintf(stderr, "[!] Could not connect to %s:%s\n", mail_server, port);
+                    state = CLOSE;
+                    continue;
+                }
+                fgets(buffer, sizeof(buffer), tcp_socket);
+                break;
+            case SMTP_HELO:
+                printf("[*] Sending HELO\n");
+                fprintf(tcp_socket, "HELO %s\n", mail_server);
+                fgets(buffer, sizeof(buffer), tcp_socket);
+                break;
+            case SMTP_MAIL:
+                printf("[*] Sending MAIL FROM\n");
+                fprintf(tcp_socket, "MAIL FROM: <%s>\r\n", sender);
+                fgets(buffer, sizeof(buffer), tcp_socket);
+                break;
+            case SMTP_RCPT:
+                printf("[*] Sending RCPT TO\n");
+                fprintf(tcp_socket, "RCPT TO: <%s>\r\n", reciever);
+                fgets(buffer, sizeof(buffer), tcp_socket);
+                break;
+            case SMTP_DATA:
+                printf("[*] Sending DATA\n");
+                fprintf(tcp_socket, "DATA\n");
+                fgets(buffer, sizeof(buffer), tcp_socket);
+                break;
+            case SMTP_SEND:
+                printf("[*] Sending email\n");
+                fprintf(tcp_socket, "From: %s\n", sender);
+                fprintf(tcp_socket, "To: %s\n", reciever);
+                fprintf(tcp_socket, "Subject: %s\n", subject);
+                fprintf(tcp_socket, "\n");
+                while(fgets(buffer, sizeof(buffer), mail_body) != NULL)
+                    fprintf(tcp_socket, "%s", buffer);
+                fprintf(tcp_socket, ".\n");
+                fgets(buffer, sizeof(buffer), tcp_socket);
+                break;
+            case SMTP_QUIT:
+                printf("[*] Sending QUIT\n");
+                fprintf(tcp_socket, "QUIT\n");
+                fgets(buffer, sizeof(buffer), tcp_socket);
+                break;
+            case CLOSE:
+                printf("[*] Closing connection\n");
+                shutdown(fileno(tcp_socket), SHUT_RDWR);
+                printf("[*] Connection closed\n");
+                if(attempt <= MAX_ATTEMPTS && buffer[0] == '4') {
+                    printf("[*] Retrying in %d seconds\n", WAIT_TIME);
+                    sleep(WAIT_TIME);
+                    attempt++;
+                    state = CONNECTION;
+                    continue;
+                }
+                return EXIT_SUCCESS;
+            default:
+                fprintf(stderr, "[!] Invalid state\n");
+                return EX_SOFTWARE;
+        }
+
+        printf("[*] Server response: %s\n", buffer);
+        if(buffer[0] != '2' && state != SMTP_DATA) {
+            state = CLOSE;
+            continue;
+        }
+        if(buffer[0] != '3' && state == SMTP_DATA) {
+            state = CLOSE;
+            continue;
+        }
+
+        state++;
     }
 
     return EXIT_SUCCESS;
 }
 
-#define LOW_LEVEL_DEBUG
+// #define LOW_LEVEL_DEBUG
 static FILE *tcp_connect(const char *hostname, const char *port) {
    FILE *f = NULL;
 

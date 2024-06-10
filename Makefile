@@ -14,7 +14,7 @@ OBJ_DIR := bin/obj
 BIN_DIR := bin
 
 # Specify the final binary name
-TARGET := $(BIN_DIR)/smtp_auto
+TARGET := $(BIN_DIR)/client_smtp
 
 # Automatically list all C source files in the SRC_DIR
 SOURCES := $(wildcard $(SRC_DIR)/*.c)

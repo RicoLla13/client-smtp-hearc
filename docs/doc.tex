@@ -1,0 +1,83 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[left=3cm, right=3cm, top=2.5cm, bottom=2.5cm, headheight=38.40865pt]{geometry} % Adjusted headheight
+\usepackage{setspace}
+\usepackage{amsmath}
+\usepackage{tikz}
+\usepackage{pgfplotstable}
+\usepackage{titlesec}
+\usepackage{bm}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins}
+\usepackage{empheq}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{float}
+\usepackage{silence}
+\usepackage{multirow}
+\WarningFilter{caption}{The option `hypcap=true' will be ignored}
+\WarningFilter{latex}{Underfull \hbox}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    pdfpagemode=FullScreen,
+    }
+\usepackage{graphicx}
+\graphicspath{ {./images/} }
+
+\pgfplotsset{compat=1.18}
+
+\titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{1em}{}
+
+\renewcommand{\contentsname}{Table des Matières}
+\renewcommand{\tablename}{Tableau}
+
+\title{Interférences et diffraction de la lumière}
+\author{Liviu Arsenescu, Cătălin Bozan}
+\date{28.05.2024}
+
+\newtcbox{\mymath}[1][]{%
+    nobeforeafter,
+    tcbox raise base,
+    enhanced,
+    colframe=black,
+    colback=white,
+    boxrule=1pt,
+    drop shadow={
+        xshift=3pt, % Removed 'shadow' prefix
+        yshift=-3pt, % Removed 'shadow' prefix
+        opacity=1
+    },
+    #1
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{\includegraphics[width=4cm]{hearclogo.png}}
+\lhead{\thepage}
+\setlength{\headsep}{30pt}
+
+\begin{document}
+    \pagenumbering{gobble}
+    \begin{titlepage}
+        \begin{center}
+            \vspace*{\fill}
+            \Huge \textbf{Client SMTP in C} \\
+            \Large Rapport du Travail \\
+            \begin{figure}[h]
+                \centering
+                \includegraphics[width=7cm]{hearclogo.png}
+            \end{figure}
+            \vspace{\fill}
+            \Large Liviu Arsenescu \\
+            16.06.2024
+
+            \vspace*{\fill}
+        \end{center}
+    \end{titlepage}
+\end{document}

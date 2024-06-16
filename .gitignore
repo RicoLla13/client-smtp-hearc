@@ -1,3 +1,9 @@
 bin
 .venv
 mail_body.txt
+
+docs/*
+
+!docs/*.tex
+!docs/*.pdf
+!docs/images

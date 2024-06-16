@@ -17,6 +17,7 @@
 \usepackage{float}
 \usepackage{silence}
 \usepackage{multirow}
+\usepackage{verbatim}
 \WarningFilter{caption}{The option `hypcap=true' will be ignored}
 \WarningFilter{latex}{Underfull \hbox}
 \hypersetup{
@@ -33,9 +34,6 @@
 
 \titleformat{\section}{\Large\bfseries}{\thesection}{1em}{}
 \titleformat{\subsection}{\large\bfseries}{\thesubsection}{1em}{}
-
-\renewcommand{\contentsname}{Table des Matières}
-\renewcommand{\tablename}{Tableau}
 
 \title{Interférences et diffraction de la lumière}
 \author{Liviu Arsenescu, Cătălin Bozan}
@@ -68,7 +66,7 @@
         \begin{center}
             \vspace*{\fill}
             \Huge \textbf{Client SMTP in C} \\
-            \Large Rapport du Travail \\
+            \Large Instructions and documentations \\
             \begin{figure}[h]
                 \centering
                 \includegraphics[width=7cm]{hearclogo.png}
@@ -80,4 +78,47 @@
             \vspace*{\fill}
         \end{center}
     \end{titlepage}
+
+    \tableofcontents
+    \pagenumbering{arabic}
+    \newpage
+
+    \section{Introduction}
+    Welcome to the documentation for the Simple SMTP Client, a project developed for the Networking course at HE-Arc Ingénierie. This project showcases the practical application of networking concepts by implementing a basic SMTP client, designed to facilitate the understanding of email protocols and client-server communication.
+    \section{Client usage}
+    \subsection{Synopsis}
+    \begin{verbatim}
+        bin/client_smtp
+            <sender email>
+            <subject>
+            <message file>
+            <mail server>
+            <reciever email>
+            [<port>]
+    \end{verbatim}
+    \subsection{Description}
+    \verb|<sender email>| - Email address of the sender. \\
+    \verb|<subject>| - Subject of the email. \\
+    \verb|<message file>| - Path to the file containing the message. \\
+    \verb|<mail server>| - Address of the mail server. \\
+    \verb|<reciever email>| - Email address of the reciever. \\
+    \verb|[<port>]| - (optional) Port number of the mail server. Default is 25.
+    \subsection{Example}
+    \begin{verbatim}
+        bin/client_smtp
+            liviu-andrei.arsenescu@he-arc.ch
+            "Some Subject"
+            mail_body.txt
+            smtp.alphanet.ch
+            liviu-andrei.arsenescu@he-arc.ch
+            587
+    \end{verbatim}
+    \subsection{Compile the program}
+    To compile the program, you can use the Makefile provided:
+    \begin{verbatim}
+        make
+    \end{verbatim}
+    The program executable is situated in \verb|./bin|
+    \section{Implementation and State Machine}
+    \section{Tests}
 \end{document}
